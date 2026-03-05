@@ -47,14 +47,19 @@ window.addEventListener('scroll', () => {
 
 
 
+// Intersection Observer Options
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
 // Animate Project Cards on Scroll
 const projectObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry, index) => {
+    entries.forEach((entry) => {
         if (entry.isIntersecting) {
-            setTimeout(() => {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }, index * 100);
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            projectObserver.unobserve(entry.target);
         }
     });
 }, observerOptions);
@@ -62,8 +67,30 @@ const projectObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll('.project-card').forEach((card, index) => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(30px)';
-    card.style.transition = 'all 0.6s ease';
+    card.style.transition = `all 0.6s ease ${index * 0.1}s`;
     projectObserver.observe(card);
+
+    // Check if card has a valid demo link
+    const demoLink = card.querySelector('.project-link[aria-label*="Live Demo"]');
+    const hasValidLink = demoLink && demoLink.getAttribute('href') &&
+        demoLink.getAttribute('href') !== '#' &&
+        !demoLink.getAttribute('href').startsWith('javascript');
+
+    if (hasValidLink) {
+        // Make card clickable
+        card.addEventListener('click', (e) => {
+            // Prevent clicking if a link inside the card was clicked directly
+            if (e.target.closest('.project-link')) return;
+
+            window.open(demoLink.href, '_blank');
+        });
+
+        // Add pointer cursor to show it's clickable
+        card.style.cursor = 'pointer';
+    } else {
+        // Ensure cursor is default for non-clickable cards
+        card.style.cursor = 'default';
+    }
 });
 
 // Form Submission
