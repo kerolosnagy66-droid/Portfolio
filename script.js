@@ -15,34 +15,24 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
-// Smooth Scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
 // Navbar Background on Scroll
 const navbar = document.querySelector('.navbar');
-let lastScroll = 0;
+let scrollTimer;
 
 window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-
-    if (currentScroll > 100) {
-        navbar.style.background = 'rgba(13, 17, 23, 0.98)';
-    } else {
-        navbar.style.background = 'rgba(13, 17, 23, 0.9)';
+    if (!scrollTimer) {
+        scrollTimer = setTimeout(() => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > 50) {
+                navbar.style.background = 'rgba(13, 17, 23, 0.98)';
+                navbar.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+            } else {
+                navbar.style.background = 'rgba(13, 17, 23, 0.85)';
+                navbar.style.boxShadow = 'none';
+            }
+            scrollTimer = null;
+        }, 50);
     }
-
-    lastScroll = currentScroll;
 });
 
 
@@ -154,13 +144,21 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Parallax Effect for Hero Section
+// Parallax Effect for Hero Section (Disabled on Mobile)
 window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    if (hero && scrolled < window.innerHeight) {
-        hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-        hero.style.opacity = 1 - (scrolled / window.innerHeight);
+    if (window.innerWidth > 768) {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero');
+        if (hero && scrolled < window.innerHeight) {
+            hero.style.transform = `translateY(${scrolled * 0.4}px)`;
+            hero.style.opacity = 1 - (scrolled / window.innerHeight);
+        }
+    } else {
+        const hero = document.querySelector('.hero');
+        if (hero) {
+            hero.style.transform = 'none';
+            hero.style.opacity = '1';
+        }
     }
 });
 
